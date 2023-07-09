@@ -1,0 +1,12 @@
+#!/bin/sh
+
+python3 -m unittest discover  -s .
+
+result=$?
+
+if [ $result -ne 0 ]; then
+	echo "Tests failed. Aborting commit."
+	exit 1
+fi
+
+exit 0
