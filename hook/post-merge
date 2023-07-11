@@ -2,8 +2,8 @@
 
 # Check if there are changes in the 'data' directory after a pull
 changed_files=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)
-data_directory_changed=$(echo "$changed_files" | grep "^data/")
+data_directory_changed=$(echo "$changed_files" | grep "^100_1/")
 
 if [ -n "$data_directory_changed" ]; then
-    python3 when_changed.py
+    python when_changed.py
 fi
