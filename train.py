@@ -60,46 +60,53 @@ class ImageClassification():
 
 
         for path in train_imgs_path:
-            train_imgs_list.append(cv2.imread(path, cv2.IMREAD_GRAYSCALE))
+            img = cv2.resize(cv2.imread(path, cv2.IMREAD_GRAYSCALE), dsize = (28, 28))
+            train_imgs_list.append(img)
+    
         for path in test_imgs_path:
-            test_imgs_list.append(cv2.imread(path, cv2.IMREAD_GRAYSCALE))
+            img = cv2.resize(cv2.imread(path, cv2.IMREAD_GRAYSCALE), dsize = (28, 28))
+            test_imgs_list.append(img)
 
         self.X_train = np.array(train_imgs_list).reshape(-1, 28, 28, 1).astype('float32')
         self.X_test = np.array(test_imgs_list).reshape(-1, 28, 28, 1).astype('float32')
 
         print (self.X_train.shape)
-        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train, self.y_train, test_size = 0.2, stratify= self.y_train)
+        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(self.X_train, self.y_train, test_size = 0.2, stratify=self.y_train)
     def train(self):
         self.model = Sequential([
-            layers.Conv2D(8, (3, 3), input_shape = (28,28,1), activation='relu'),
+            layers.Conv2D(8, (3, 3), input_shape = (28, 28, 1), activation='relu'),
             layers.ZeroPadding2D(padding=(1,1)),
             layers.Conv2D(16, (3, 3), activation='relu'),
             layers.ZeroPadding2D(padding=(1,1)),
             layers.Conv2D(32, (3, 3), activation='relu'),
             layers.ZeroPadding2D(padding=(1,1)),
-
             layers.Conv2D(64, (3, 3), activation='relu'),
             layers.ZeroPadding2D(padding=(1,1)),
-
             layers.Conv2D(128, (3, 3), activation='relu'),
             layers.ZeroPadding2D(padding=(1,1)),
 
+            layers.Conv2D(256, (3, 3), activation='relu'),
+            layers.ZeroPadding2D(padding=(1,1)),
+            layers.Conv2D(512, (3, 3), activation='relu'),
+            layers.ZeroPadding2D(padding=(1,1)),
 
             layers.Flatten(),
-            layers.Dense(1000, activation='relu'),
             layers.Dense(500, activation='relu'),
             layers.Dense(50, activation='relu'),
             layers.Dense(10, activation='softmax')
         ])
-        print (self.model.summary())
+
         self.model.compile(
             optimizer = 'adam',
             loss = 'sparse_categorical_crossentropy',
             metrics= ['accuracy']
         )
         es = EarlyStopping(patience=10)
-        self.history = self.model.fit(self.X_train, self.y_train, batch_size = 512, epochs = 100, validation_data=(self.X_val, self.y_val), callbacks=[es])
+
+        print (self.model.summary())
+        self.history = self.model.fit(self.X_train, self.y_train, batch_size = 500, epochs = 100, validation_data=(self.X_val, self.y_val), callbacks=[es])
     def evaluate(self):
         print (self.model.evaluate(self.X_test, self.y_test))
+        self.model.save('models')
 if __name__ == "__main__":
     changed()
