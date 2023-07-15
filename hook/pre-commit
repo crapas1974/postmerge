@@ -1,6 +1,6 @@
 #!/bin/sh
 
-python3 -m unittest discover  -s .
+python -m unittest discover  -s .
 
 result=$?
 
